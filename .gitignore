@@ -1,5 +1,6 @@
 tests/
 *.java
 *.cpp
-.idea
+/.idea/
 
+/env/
