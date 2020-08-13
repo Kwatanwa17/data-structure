@@ -9,17 +9,17 @@ threading.stack_size(2 ** 27)  # new thread will get stack of such size
 class TreeOrders:
     def read(self):
 
-        # self.n = int(sys.stdin.readline())
+        self.n = int(sys.stdin.readline())
 
-        f = open("./tests/2")
-        self.n = int(f.readline())
+        # f = open("./tests/2")
+        # self.n = int(f.readline())
 
         self.key = [0 for i in range(self.n)]
         self.left = [0 for i in range(self.n)]
         self.right = [0 for i in range(self.n)]
         for i in range(self.n):
-            # [a, b, c] = map(int, sys.stdin.readline().split())
-            [a, b, c] = map(int, f.readline().split())
+            [a, b, c] = map(int, sys.stdin.readline().split())
+            # [a, b, c] = map(int, f.readline().split())
             self.key[i] = a
             self.left[i] = b
             self.right[i] = c
@@ -30,129 +30,77 @@ class TreeOrders:
         # You may need to add a new recursive method to do that
         current = 0
         # stack
-        s = [current]
+        s = []
 
-        while s:
+        while True:
 
-            # if the vertex has a left son
-            if self.left[current] != -1:
-                # append the left son index to the stack
-                s.append(self.left[current])
-                current = self.left[current]
-                # if self.left[current] == -1 the stack remains as it is
-                continue
             if current != -1:
+                s.append(current)
+                current = self.left[current]
+
+            elif s:
+                current = s.pop()
                 self.result.append(self.key[current])
-            s.pop()
 
-            # current belongs to the left subtree of the last element of the stack, which is its ancestor
-            while s and (self.left[s[len(s) - 1]]) != current:
-                current = s[len(s) - 1]
-                if current != -1:
-                    self.result.append(self.key[current])
-                s.pop()
+                current = self.right[current]
 
-            if s:
-                s.append(self.right[current])
-                current = self.right[current]
-                # if current != -1:
-                #     self.result.append(self.key[current])
-            # go to the right subtree
-            elif len(self.result) < len(self.key):
-                s.append(self.right[current])
-                current = self.right[current]
+            else:
+                break
 
         return self.result
 
     def preOrder(self):
         self.result = []
-        # Finish the implementation
-        # You may need to add a new recursive method to do that
+
         current = 0
-        # stack
-        s = [current]
+        s = []
+
+        # push root to the stack
+        s.append(current)
 
         while s:
-            if self.key[current] not in self.result and current != -1:
-                self.result.append(self.key[current])
 
-            # if the vertex has a left son
+            # pop the top element of the stack and set it as current
+            current = s.pop()
+            self.result.append(self.key[current])
+
+            # push left and right sons to the stack
+            if self.right[current] != -1:
+                s.append(self.right[current])
+
             if self.left[current] != -1:
-                # append the left son index to the stack
                 s.append(self.left[current])
-                current = self.left[current]
-                # if self.left[current] == -1 the stack remains as it is
-                continue
-
-            s.pop()
-
-            # current belongs to the left subtree of the last element of the stack, which is its ancestor
-            while s and (self.left[s[len(s) - 1]]) != current:
-                current = s[len(s) - 1]
-                # if current != -1:
-                #     self.result.append(self.key[current])
-                s.pop()
-
-            if s:
-                s.append(self.right[current])
-                current = self.right[current]
-                # if current != -1:
-                #     self.result.append(self.key[current])
-            # go to the right subtree
-            elif len(self.result) < len(self.key):
-                s.append(self.right[current])
-                current = self.right[current]
 
         return self.result
 
     def postOrder(self):
+        # create an empty stack
         self.result = []
-        # Finish the implementation
-        # You may need to add a new recursive method to do that
+
         current = 0
-        # stack
-        s = [current]
 
-        while s:
+        # use 2 stacks
+        s1 = []
+        s2 = []
 
-            # if the vertex has a left son
+        # push current to the stack 1
+        s1.append(current)
+
+        while s1:
+            current = s1.pop()
+            s2.append(current)
+
             if self.left[current] != -1:
-                # append the left son index to the stack
-                s.append(self.left[current])
-                current = self.left[current]
-                # if self.left[current] == -1 the stack remains as it is
-                continue
-            if self.left[current] == -1 and self.right[current] == -1:
-                s.pop()
+                s1.append(self.left[current])
 
-            if self.key[current] not in self.result and current != -1:
-                self.result.append(self.key[current])
+            if self.right[current] != -1:
+                s1.append(self.right[current])
 
-            # current belongs to the left subtree of the last element of the stack, which is its ancestor
-            while s and (self.left[s[len(s) - 1]]) != current:
-                current = s[len(s) - 1]
-                # if current != -1:
-                #     self.result.append(self.key[current])
-                if self.left[current] == -1 and self.right[current] == -1:
-                    s.pop()
-                else:
-                    break
-
-            if s:
-                if self.right[current] not in s:
-                    if self.key[self.right[current]] not in self.result:
-                        s.append(self.right[current])
-                        current = self.right[current]
-                # if current != -1:
-                #     self.result.append(self.key[current])
-            # go to the right subtree
-            elif len(self.result) < len(self.key):
-                s.append(self.right[current])
-                current = self.right[current]
-
+        # map index to key
+        for idx in reversed(s2):
+            self.result.append(self.key[idx])
 
         return self.result
-
 
 def main():
     tree = TreeOrders()
